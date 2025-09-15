@@ -5,25 +5,23 @@
 {% block content %}
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-3">
-            <form method="GET">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <h3><u>Filters</u></h3>
-                            </div>
-                            <div class="col-md-4">
-                                <a href="{% url 'statistics_app:public' %}" class="btn btn-outline-info">
-                                    <i class="fa fa-times"></i>&nbsp;Clear
-                                </a>
-                            </div>
+        <div class="col-md-3 filters-sticky">
+            <form method="GET" id="filters-form">
+                <div class="card filters-accordion" id="filters-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0"><u>Filters</u></h3>
+                        <div>
+                            <button type="button" id="filters-toggle" class="btn btn-sm btn-outline-secondary d-md-none">Toggle</button>
+                            <a href="{% url 'statistics_app:public' %}" id="filters-clear" class="btn btn-outline-info ml-2">
+                                <i class="fa fa-times"></i>&nbsp;Clear
+                            </a>
                         </div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body filters-body">
                         <div>From date: {{form.from_date}}</div>
                         <div>To date: {{form.to_date}}</div>
                         <div>Workshop: {{form.workshop_type}}</div>
+                        
                         <div>State: {{form.state}}</div>
                         <div>{{form.sort.help_text}}: {{form.sort}}</div>
                         {% if request.user.is_authenticated %}
@@ -37,56 +35,61 @@
                                 </button>
                             </div>
                             <div class="col-md-6">
-                                <button type="submit" class="btn btn-info" name="download" value="download">
+                                <button type="submit" class="btn btn-info" id="download-btn" name="download" value="download">
                                     <i class="fa fa-download"></i>&nbsp;Download
                                 </button>
                             </div>
                         </div>
+                        <div class="mt-2 d-flex flex-wrap" id="filter-chips" aria-live="polite"></div>
                     </div>
                 </div>
             </form>
         </div>
         <div class="col">
-            <div class="row">
+            <div class="row charts-row">
                 <div class="col-md-6">
                     {% include "statistics_app/paginator.html" %}
                 </div>
-                <div class="col-md-3">
-                    <button class="btn btn-info" id="state_graph">
+                <div class="col-md-3 col-6">
+                    <button class="btn btn-info btn-chart" data-action="state-graph">
                         <i class="fa fa-bar-chart"></i>&nbsp;State chart
                     </button>
                 </div>
-                <div class="col-md-3">
-                    <button class="btn btn-info" id="type_graph">
+                <div class="col-md-3 col-6">
+                    <button class="btn btn-info btn-chart" data-action="type-graph">
                         <i class="fa fa-bar-chart"></i>&nbsp;Workshops chart
                     </button>
                 </div>
             </div>
-            <table class="table table-responsive-sm">
+            <div class="responsive-table">
+            <table class="table table-responsive-sm table-sticky" id="stats-table">
                 <thead>
                     <tr>
-                        <th>Sr No.</th>
-                        <th>Coordinator Name</th>
-                        <th>Institute Name</th>
-                        <th>Instructor Name</th>
-                        <th>Workshop Name</th>
-                        <th>Workshop Date</th>
+                        <th class="th-sortable" data-key="sn">Sr No. <span class="sort-indicator"></span></th>
+                        <th class="th-sortable" data-key="coord">Coordinator Name <span class="sort-indicator"></span></th>
+                        <th class="th-sortable" data-key="insti">Institute Name <span class="sort-indicator"></span></th>
+                        <th class="th-sortable" data-key="instr">Instructor Name <span class="sort-indicator"></span></th>
+                        <th class="th-sortable" data-key="wname">Workshop Name <span class="sort-indicator"></span></th>
+                        <th class="th-sortable" data-key="wdate">Workshop Date <span class="sort-indicator"></span></th>
+                        <th class="d-none">Branch</th>
                     </tr>
                 </thead>
                 {% csrf_token %}
+                <tbody id="stats-body">
                 {% for workshop in objects %}
-                    <tbody>
-                        <tr>
-                            <td>{{ forloop.counter0|add:objects.start_index}}</td>
-                            <td>{{ workshop.coordinator.get_full_name | capfirst }}</td>
-                            <td>{{ workshop.coordinator.profile.institute | capfirst }}</td>
-                            <td>{{ workshop.instructor.get_full_name | capfirst }}</td>
-                            <td>{{ workshop.workshop_type.name }}</td>
-                            <td>{{ workshop.date | date}}</td>
-                        </tr>
-                    </tbody>
+                    <tr data-branch="Server">
+                        <td>{{ forloop.counter0|add:objects.start_index}}</td>
+                        <td>{{ workshop.coordinator.get_full_name | capfirst }}</td>
+                        <td>{{ workshop.coordinator.profile.institute | capfirst }}</td>
+                        <td>{{ workshop.instructor.get_full_name | capfirst }}</td>
+                        <td>{{ workshop.workshop_type.name }}</td>
+                        <td>{{ workshop.date | date}}</td>
+                        <td class="d-none">Server</td>
+                    </tr>
                 {% endfor %}
+                </tbody>
             </table>
+            </div>
             {% include "statistics_app/paginator.html" %}
         </div>
     </div>
@@ -103,11 +106,73 @@
     var type_labels = {{ws_type|safe}};
     var type_data = {{ws_type_count|safe}};
     var chart;
-    $("#state_graph").on("click", function() {
-        show_graph(state_labels, state_data, "State wise workshops");
+    // Filters: mobile accordion
+    (function(){
+        var card = document.getElementById('filters-card');
+        var toggle = document.getElementById('filters-toggle');
+        if (toggle && card) {
+            toggle.addEventListener('click', function(){ card.classList.toggle('open'); });
+        }
+    })();
+
+    // Filters: date validation + chips + URL sync
+    (function(){
+        var form = document.getElementById('filters-form');
+        if (!form) return;
+        var from = document.getElementById('id_from_date');
+        var to = document.getElementById('id_to_date');
+        var stateSel = document.getElementById('id_state');
+        var typeSel = document.getElementById('id_workshop_type');
+        var sortSel = document.getElementById('id_sort');
+        var chips = document.getElementById('filter-chips');
+        function makeChip(label, value){ if (!value) return ''; return '<span class="badge badge-secondary mr-1 mb-1">' + label + ': ' + value + '</span>'; }
+        function updateChips(){
+            if (!chips) return;
+            var arr = [];
+            var typeText = (typeSel && typeSel.options[typeSel.selectedIndex]) ? typeSel.options[typeSel.selectedIndex].text.trim() : '';
+            var stateText = (stateSel && stateSel.options[stateSel.selectedIndex]) ? stateSel.options[stateSel.selectedIndex].text.trim() : '';
+            var sortText = (sortSel && sortSel.options[sortSel.selectedIndex]) ? sortSel.options[sortSel.selectedIndex].text.trim() : '';
+            if (from && from.value) arr.push(makeChip('From', from.value));
+            if (to && to.value) arr.push(makeChip('To', to.value));
+            if (typeText && typeText !== '---------') arr.push(makeChip('Workshop', typeText));
+            if (stateText && stateText !== '---------') arr.push(makeChip('State', stateText));
+            if (sortText && sortText.toLowerCase() !== 'oldest') arr.push(makeChip('Sort', sortText));
+            chips.innerHTML = arr.join('');
+        }
+        function validDates(){ if (!from || !to || !from.value || !to.value) return true; return new Date(from.value) <= new Date(to.value); }
+        form.addEventListener('submit', function(e){ if (!validDates()){ e.preventDefault(); toastr && toastr.error('To date must be on or after From date'); }});
+        $(document).on('change', '#id_from_date,#id_to_date,#id_state,#id_workshop_type,#id_sort', function(){
+            updateChips();
+            var params = new URLSearchParams(window.location.search);
+            if (from && from.value) params.set('from_date', from.value); else params.delete('from_date');
+            if (to && to.value) params.set('to_date', to.value); else params.delete('to_date');
+            if (stateSel && stateSel.value) params.set('state', stateSel.value); else params.delete('state');
+            if (typeSel && typeSel.value) params.set('workshop_type', typeSel.value); else params.delete('workshop_type');
+            if (sortSel && sortSel.value) params.set('sort', sortSel.value); else params.delete('sort');
+            var url = window.location.pathname + '?' + params.toString();
+            window.history.replaceState({}, '', url);
+        });
+        var clearBtn = document.getElementById('filters-clear');
+        if (clearBtn) { clearBtn.addEventListener('click', function(){ localStorage.removeItem('stats_filters'); localStorage.removeItem('stats_sort'); }); }
+        updateChips();
+    })();
+    // Ensure the download button actually submits the filter form
+    $(document).on('click', '#download-btn', function() {
+        var $form = $(this).closest('form');
+        if ($form && $form.length) {
+            // Force method GET with download parameter already present
+            // Browser will download CSV returned by the server
+            $form.trigger('submit');
+        }
     });
-    $("#type_graph").on("click", function() {
-        show_graph(type_labels, type_data, "Type wise workshops");
+    $(document).on('click', '.btn-chart', function(e) {
+        e.preventDefault();
+        var action = $(this).data('action');
+        if (action === 'state-graph') {
+            show_graph(state_labels, state_data, "State wise workshops");
+        } else if (action === 'type-graph') {
+            show_graph(type_labels, type_data, "Type wise workshops");
+        }
     });
 
     function show_graph(labels, data, graph_name, chart_name) {
@@ -135,6 +200,184 @@
             height: 500
         });
     }
+
+    // --- Demo: inject dummy rows ---
+    (function() {
+        var tbody = document.getElementById('stats-body');
+        if (!tbody) return;
+        var startIndex = tbody.querySelectorAll('tr').length + 1;
+        var dummy = [
+            {c:'Riya Mehta', i:'IIT Bombay', t:'Dr. A. Sharma', w:'Intro to Algorithms', d:'2025-09-20', b:'Computer Science'},
+            {c:'Arjun Nair', i:'IIT Delhi', t:'Prof. K. Verma', w:'Data Structures Workshop', d:'2025-09-22', b:'Computer Science'},
+            {c:'Neha Gupta', i:'IIT Kanpur', t:'Dr. R. Singh', w:'Thermodynamics Basics', d:'2025-09-23', b:'Mechanical Engineering'},
+            {c:'Vikram Rao', i:'IIT Madras', t:'Prof. M. Iyer', w:'CAD for Beginners', d:'2025-09-25', b:'Mechanical Engineering'},
+            {c:'Sara Khan', i:'IIT Roorkee', t:'Dr. P. Kulkarni', w:'Circuit Analysis 101', d:'2025-09-26', b:'Electrical Engineering'},
+            {c:'Ankit Patel', i:'NIT Trichy', t:'Prof. S. Menon', w:'Power Systems Intro', d:'2025-09-28', b:'Electrical Engineering'},
+            {c:'Priya Shah', i:'IIT Guwahati', t:'Dr. T. Desai', w:'Structural Engineering Basics', d:'2025-09-29', b:'Civil Engineering'},
+            {c:'Rahul Das', i:'NIT Surathkal', t:'Prof. B. Rao', w:'Surveying Workshop', d:'2025-10-01', b:'Civil Engineering'},
+            {c:'Kunal Jain', i:'IIT BHU', t:'Dr. N. Kapoor', w:'Digital Electronics', d:'2025-10-03', b:'Electronics Engineering'},
+            {c:'Isha Aggarwal', i:'IIIT Hyderabad', t:'Prof. V. Reddy', w:'Embedded Systems Basics', d:'2025-10-04', b:'Electronics Engineering'},
+            {c:'Maya Iyer', i:'ICT Mumbai', t:'Dr. G. Prasad', w:'Chemical Process Safety', d:'2025-10-06', b:'Chemical Engineering'},
+            {c:'Rohit Sen', i:'NIT Rourkela', t:'Prof. D. Banerjee', w:'Reaction Engineering Intro', d:'2025-10-08', b:'Chemical Engineering'}
+        ];
+        var frag = document.createDocumentFragment();
+        dummy.forEach(function(row, idx) {
+            var tr = document.createElement('tr');
+            tr.setAttribute('data-branch', row.b);
+            tr.innerHTML = '<td>' + (startIndex + idx) + '</td>' +
+                           '<td>' + row.c + '</td>' +
+                           '<td>' + row.i + '</td>' +
+                           '<td>' + row.t + '</td>' +
+                           '<td>' + row.w + ' <span class="badge badge-secondary">Demo</span></td>' +
+                           '<td>' + row.d + '</td>' +
+                           '<td class="d-none">' + row.b + '</td>';
+            frag.appendChild(tr);
+        });
+        tbody.appendChild(frag);
+
+        // Populate Workshop select with dummy workshop names if missing
+        var wsSelect = document.getElementById('id_workshop_type');
+        if (wsSelect) {
+            var existing = new Set(Array.prototype.map.call(wsSelect.options || [], function(o){return (o.text || '').trim();}));
+            var names = Array.from(new Set(dummy.map(function(r){return r.w;})));
+            names.forEach(function(name){
+                if (!existing.has(name)) {
+                    var opt = document.createElement('option');
+                    opt.value = 'demo:' + name;
+                    opt.text = name + ' (Demo)';
+                    wsSelect.appendChild(opt);
+                }
+            });
+        }
+    })();
+
+    // --- Client-side column sorting ---
+    (function() {
+        var table = document.getElementById('stats-table');
+        var tbody = document.getElementById('stats-body');
+        if (!table || !tbody) return;
+        function text(el, selector) {
+            var n = selector ? el.querySelector(selector) : el;
+            return (n ? (n.innerText || n.textContent) : '').trim();
+        }
+        function cmp(a, b, key) {
+            if (key === 'wdate') {
+                return new Date(a) - new Date(b);
+            }
+            var aa = a.toLowerCase(), bb = b.toLowerCase();
+            if (aa < bb) return -1;
+            if (aa > bb) return 1;
+            return 0;
+        }
+        function getCellValue(tr, key) {
+            switch (key) {
+                case 'sn': return text(tr.children[0]);
+                case 'coord': return text(tr.children[1]);
+                case 'insti': return text(tr.children[2]);
+                case 'instr': return text(tr.children[3]);
+                case 'wname': return text(tr.children[4]);
+                case 'wdate': return text(tr.children[5]);
+                default: return '';
+            }
+        }
+        function setIndicator(th, dir) {
+            table.querySelectorAll('.th-sortable .sort-indicator').forEach(function(i){ i.textContent = ''; });
+            var ind = th.querySelector('.sort-indicator');
+            if (ind) ind.textContent = dir === 'asc' ? '▲' : '▼';
+        }
+        var state = { key: 'wdate', dir: 'asc' };
+        table.querySelectorAll('.th-sortable').forEach(function(th) {
+            th.addEventListener('click', function() {
+                var key = th.getAttribute('data-key');
+                state.dir = (state.key === key && state.dir === 'asc') ? 'desc' : 'asc';
+                state.key = key;
+                var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+                rows.sort(function(r1, r2) {
+                    var v1 = getCellValue(r1, key);
+                    var v2 = getCellValue(r2, key);
+                    var res = cmp(v1, v2, key);
+                    return state.dir === 'asc' ? res : -res;
+                });
+                var frag = document.createDocumentFragment();
+                rows.forEach(function(r){ frag.appendChild(r); });
+                tbody.appendChild(frag);
+                setIndicator(th, state.dir);
+                // Save sort choice
+                localStorage.setItem('stats_sort', JSON.stringify(state));
+            });
+        });
+        // Restore saved sort
+        try {
+            var saved = JSON.parse(localStorage.getItem('stats_sort') || 'null');
+            if (saved && saved.key) {
+                var target = table.querySelector('.th-sortable[data-key="' + saved.key + '"]');
+                if (target) {
+                    state = saved;
+                    target.click(); // triggers sort and indicator
+                }
+            }
+        } catch (e) {}
+    })();
+
+    // --- Persist filters (from/to/state/type) ---
+    (function(){
+        var ids = ['id_from_date','id_to_date','id_state','id_workshop_type','id_sort','id_show_workshops'];
+        function save(){
+            var obj = {};
+            ids.forEach(function(id){ var el = document.getElementById(id); if (el) obj[id] = el.value || (el.checked? 'on': ''); });
+            localStorage.setItem('stats_filters', JSON.stringify(obj));
+        }
+        function restore(){
+            try{
+                var obj = JSON.parse(localStorage.getItem('stats_filters')||'null');
+                if (!obj) return;
+                ids.forEach(function(id){ var el = document.getElementById(id); if (!el) return; if (el.type === 'checkbox') el.checked = obj[id]==='on'; else el.value = obj[id]||el.value; });
+            }catch(e){}
+        }
+        restore();
+        $(document).on('change', '#id_from_date,#id_to_date,#id_state,#id_workshop_type,#id_sort,#id_show_workshops', save);
+    })();
+
+    // --- Empty state when no rows ---
+    (function(){
+        var tbody = document.getElementById('stats-body');
+        if (!tbody) return;
+        function updateEmpty(){
+            var visible = Array.prototype.filter.call(tbody.querySelectorAll('tr'), function(tr){ return tr.style.display !== 'none'; });
+            var empty = document.getElementById('empty-row');
+            if (visible.length === 0) {
+                if (!empty) {
+                    var tr = document.createElement('tr');
+                    tr.id = 'empty-row';
+                    tr.innerHTML = '<td colspan="6" class="text-center text-muted">No workshops to display</td>';
+                    tbody.appendChild(tr);
+                }
+            } else if (empty) {
+                empty.remove();
+            }
+        }
+        updateEmpty();
+    })();
+
+    // --- Quick details modal on row click ---
+    (function(){
+        var tbody = document.getElementById('stats-body');
+        if (!tbody) return;
+        $(tbody).on('click', 'tr', function(){
+            var tds = this.querySelectorAll('td');
+            if (!tds || tds.length < 6) return;
+            var html = '<p><strong>Coordinator:</strong> ' + tds[1].innerText + '</p>' +
+                       '<p><strong>Institute:</strong> ' + tds[2].innerText + '</p>' +
+                       '<p><strong>Instructor:</strong> ' + tds[3].innerText + '</p>' +
+                       '<p><strong>Workshop:</strong> ' + tds[4].innerText + '</p>' +
+                       '<p><strong>Date:</strong> ' + tds[5].innerText + '</p>';
+            var dlg = document.getElementById('dialog');
+            if (dlg) {
+                dlg.innerHTML = '<div class="p-3">' + html + '</div>';
+                $(dlg).dialog({ width: 600, height: 400, title: 'Workshop Details' });
+            }
+        });
+    })();
 </script>
 
 {% endblock %}

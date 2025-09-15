@@ -23,6 +23,7 @@ from local_settings import (
 
 from decouple import config
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -151,7 +152,11 @@ EMAIL_USE_TLS = EMAIL_USE_TLS
 EMAIL_TIMEOUT = 300
 SENDER_EMAIL = SENDER_EMAIL
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Use file-based email backend to avoid Windows console (colorama) OSError
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'workshop_app', 'logs', 'outbox')
+# Ensure email outbox directory exists
+os.makedirs(EMAIL_FILE_PATH, exist_ok=True)
 
 # Change this to the production url
 PRODUCTION_URL = 'http://localhost:8000'

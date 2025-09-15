@@ -62,8 +62,12 @@ def index(request):
     user = request.user
     if user.is_authenticated and is_email_checked(user):
         return redirect(get_landing_page(user))
+    # For anonymous users, send to public statistics instead of login
+    return redirect(reverse('statistics_app:public'))
 
-    return redirect(reverse('workshop_app:login'))
+
+def home(request):
+    return render(request, 'workshop_app/home.html')
 
 
 # User views
@@ -151,7 +155,7 @@ def user_register(request):
             return render(request, 'workshop_app/activation.html')
         else:
             if request.user.is_authenticated:
-                return redirect('workshop:view_profile')
+                return redirect('workshop_app:view_profile')
             return render(
                 request, "workshop_app/register.html",
                 {"form": form}

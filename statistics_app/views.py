@@ -56,7 +56,13 @@ def workshop_public_stats(request):
         if state:
             workshops = workshops.filter(coordinator__profile__state=state)
         if workshoptype:
-            workshops = workshops.filter(workshop_type_id=workshoptype)
+            # Ignore demo/non-numeric values coming from client-side demo options
+            try:
+                wt_id = int(workshoptype)
+                workshops = workshops.filter(workshop_type_id=wt_id)
+            except (TypeError, ValueError):
+                # Skip filtering if not a valid numeric id
+                pass
     else:
         today = timezone.now()
         upto = today + dt.timedelta(days=15)

@@ -1,0 +1,243 @@
+{% extends 'workshop_app/base.html' %}
+{% load static %}
+
+{% block title %} Home {% endblock %}
+
+{% block content %}
+<section class="workshops-section">
+	<div class="workshops-header">
+		<h1>Join Our <span>Free Workshops</span></h1>
+		<p>Carefully curated sessions to elevate your skills across multiple domains.</p>
+	</div>
+
+	<div class="workshops-grid">
+		<!-- 1 -->
+		<article class="workshop-card">
+			<img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1200&auto=format&fit=crop" alt="Intro to Algorithms" class="workshop-banner">
+			<div class="workshop-body">
+				<h3 class="workshop-title">Intro to Algorithms</h3>
+				<p class="workshop-time"><strong>Start:</strong> Sep 20, 2025, 3:30 PM</p>
+				<p class="workshop-time"><strong>End:</strong> Sep 20, 2025, 6:30 PM</p>
+				<p class="workshop-seats">12 seats left</p>
+				<a class="workshop-btn" href="{% url 'workshop_app:register' %}">Register Now</a>
+			</div>
+		</article>
+
+		<!-- 2 -->
+		<article class="workshop-card">
+			<img src="https://images.unsplash.com/photo-1551281044-8c87d4df22db?q=80&w=1200&auto=format&fit=crop" alt="Data Structures Workshop" class="workshop-banner">
+			<div class="workshop-body">
+				<h3 class="workshop-title">Data Structures Workshop</h3>
+				<p class="workshop-time"><strong>Start:</strong> Sep 20, 2025, 5:30 PM</p>
+				<p class="workshop-time"><strong>End:</strong> Sep 20, 2025, 8:30 PM</p>
+				<p class="workshop-seats">18 seats left</p>
+				<a class="workshop-btn" href="{% url 'workshop_app:register' %}">Register Now</a>
+			</div>
+		</article>
+
+		<!-- 3 -->
+		<article class="workshop-card">
+			<img src="https://images.unsplash.com/photo-1581092580502-7c74c6d0aa9b?q=80&w=1200&auto=format&fit=crop" alt="Thermodynamics Basics" class="workshop-banner">
+			<div class="workshop-body">
+				<h3 class="workshop-title">Thermodynamics Basics</h3>
+				<p class="workshop-time"><strong>Start:</strong> Sep 21, 2025, 10:00 AM</p>
+				<p class="workshop-time"><strong>End:</strong> Sep 21, 2025, 1:00 PM</p>
+				<p class="workshop-seats">9 seats left</p>
+				<a class="workshop-btn" href="{% url 'workshop_app:register' %}">Register Now</a>
+			</div>
+		</article>
+
+		<!-- 4 -->
+		<article class="workshop-card">
+			<img src="https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?q=80&w=1200&auto=format&fit=crop" alt="CAD for Beginners" class="workshop-banner">
+			<div class="workshop-body">
+				<h3 class="workshop-title">CAD for Beginners</h3>
+				<p class="workshop-time"><strong>Start:</strong> Sep 21, 2025, 2:00 PM</p>
+				<p class="workshop-time"><strong>End:</strong> Sep 21, 2025, 5:00 PM</p>
+				<p class="workshop-seats">15 seats left</p>
+				<a class="workshop-btn" href="{% url 'workshop_app:register' %}">Register Now</a>
+			</div>
+		</article>
+
+		<!-- 5 -->
+		<article class="workshop-card">
+			<img src="https://images.unsplash.com/photo-1581093588401-16ec8a2d89a0?q=80&w=1200&auto=format&fit=crop" alt="Circuit Analysis 101" class="workshop-banner">
+			<div class="workshop-body">
+				<h3 class="workshop-title">Circuit Analysis 101</h3>
+				<p class="workshop-time"><strong>Start:</strong> Sep 22, 2025, 9:00 AM</p>
+				<p class="workshop-time"><strong>End:</strong> Sep 22, 2025, 12:00 PM</p>
+				<p class="workshop-seats">22 seats left</p>
+				<a class="workshop-btn" href="{% url 'workshop_app:register' %}">Register Now</a>
+			</div>
+		</article>
+
+		<!-- 6 -->
+		<article class="workshop-card">
+			<img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=1200&auto=format&fit=crop" alt="Power Systems Intro" class="workshop-banner">
+			<div class="workshop-body">
+				<h3 class="workshop-title">Power Systems Intro</h3>
+				<p class="workshop-time"><strong>Start:</strong> Sep 22, 2025, 2:00 PM</p>
+				<p class="workshop-time"><strong>End:</strong> Sep 22, 2025, 5:00 PM</p>
+				<p class="workshop-seats">11 seats left</p>
+				<a class="workshop-btn" href="{% url 'workshop_app:register' %}">Register Now</a>
+			</div>
+		</article>
+
+		<!-- 7 -->
+		<article class="workshop-card">
+			<img src="https://images.unsplash.com/photo-1542623024-a797a755b8d0?q=80&w=1200&auto=format&fit=crop" alt="Structural Engineering Basics" class="workshop-banner">
+			<div class="workshop-body">
+				<h3 class="workshop-title">Structural Engineering Basics</h3>
+				<p class="workshop-time"><strong>Start:</strong> Sep 23, 2025, 10:00 AM</p>
+				<p class="workshop-time"><strong>End:</strong> Sep 23, 2025, 1:00 PM</p>
+				<p class="workshop-seats">7 seats left</p>
+				<a class="workshop-btn" href="{% url 'workshop_app:register' %}">Register Now</a>
+			</div>
+		</article>
+
+		<!-- 8 -->
+		<article class="workshop-card">
+			<img src="https://images.unsplash.com/photo-1504384764586-bb4cdc1707b0?q=80&w=1200&auto=format&fit=crop" alt="Surveying Workshop" class="workshop-banner">
+			<div class="workshop-body">
+				<h3 class="workshop-title">Surveying Workshop</h3>
+				<p class="workshop-time"><strong>Start:</strong> Sep 23, 2025, 2:30 PM</p>
+				<p class="workshop-time"><strong>End:</strong> Sep 23, 2025, 5:30 PM</p>
+				<p class="workshop-seats">16 seats left</p>
+				<a class="workshop-btn" href="{% url 'workshop_app:register' %}">Register Now</a>
+			</div>
+		</article>
+
+		<!-- 9 -->
+		<article class="workshop-card">
+			<img src="https://images.unsplash.com/photo-1518773553398-650c184e0bb3?q=80&w=1200&auto=format&fit=crop" alt="Digital Electronics" class="workshop-banner">
+			<div class="workshop-body">
+				<h3 class="workshop-title">Digital Electronics</h3>
+				<p class="workshop-time"><strong>Start:</strong> Sep 24, 2025, 11:00 AM</p>
+				<p class="workshop-time"><strong>End:</strong> Sep 24, 2025, 2:00 PM</p>
+				<p class="workshop-seats">10 seats left</p>
+				<a class="workshop-btn" href="{% url 'workshop_app:register' %}">Register Now</a>
+			</div>
+		</article>
+
+		<!-- 10 -->
+		<article class="workshop-card">
+			<img src="https://images.unsplash.com/photo-1517433456452-f9633a875f6f?q=80&w=1200&auto=format&fit=crop" alt="Embedded Systems Basics" class="workshop-banner">
+			<div class="workshop-body">
+				<h3 class="workshop-title">Embedded Systems Basics</h3>
+				<p class="workshop-time"><strong>Start:</strong> Sep 24, 2025, 3:00 PM</p>
+				<p class="workshop-time"><strong>End:</strong> Sep 24, 2025, 6:00 PM</p>
+				<p class="workshop-seats">14 seats left</p>
+				<a class="workshop-btn" href="{% url 'workshop_app:register' %}">Register Now</a>
+			</div>
+		</article>
+
+		<!-- 11 -->
+		<article class="workshop-card">
+			<img src="https://images.unsplash.com/photo-1532635223-4781b9d1d2b4?q=80&w=1200&auto=format&fit=crop" alt="Chemical Process Safety" class="workshop-banner">
+			<div class="workshop-body">
+				<h3 class="workshop-title">Chemical Process Safety</h3>
+				<p class="workshop-time"><strong>Start:</strong> Sep 25, 2025, 10:30 AM</p>
+				<p class="workshop-time"><strong>End:</strong> Sep 25, 2025, 1:30 PM</p>
+				<p class="workshop-seats">20 seats left</p>
+				<a class="workshop-btn" href="{% url 'workshop_app:register' %}">Register Now</a>
+			</div>
+		</article>
+
+		<!-- 12 -->
+		<article class="workshop-card">
+			<img src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=1200&auto=format&fit=crop" alt="Reaction Engineering Intro" class="workshop-banner">
+			<div class="workshop-body">
+				<h3 class="workshop-title">Reaction Engineering Intro</h3>
+				<p class="workshop-time"><strong>Start:</strong> Sep 25, 2025, 2:00 PM</p>
+				<p class="workshop-time"><strong>End:</strong> Sep 25, 2025, 5:00 PM</p>
+				<p class="workshop-seats">17 seats left</p>
+				<a class="workshop-btn" href="{% url 'workshop_app:register' %}">Register Now</a>
+			</div>
+		</article>
+	</div>
+</section>
+
+<style>
+	.workshops-section { padding: 2rem 1rem; background: linear-gradient(180deg, #f6f8ff 0%, #ffffff 100%); }
+	.workshops-header { max-width: 1100px; margin: 0 auto 1.5rem; text-align: left; }
+	.workshops-header h1 { font-weight: 800; color: #0f172a; margin: 0 0 .25rem; }
+	.workshops-header h1 span { color: #f59e0b; }
+	.workshops-header p { color: #475569; margin: 0; }
+
+	.workshops-grid {
+		max-width: 1100px; margin: 0 auto;
+		display: grid; gap: 1.25rem;
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	@media (max-width: 1024px) {
+		.workshops-grid { grid-template-columns: repeat(2, 1fr); }
+	}
+	@media (max-width: 640px) {
+		.workshops-grid { grid-template-columns: 1fr; }
+	}
+
+	.workshop-card {
+		background: #ffffff; border-radius: 14px; overflow: hidden;
+		box-shadow: 0 8px 20px rgba(2,6,23,.06);
+		transition: transform .18s ease, box-shadow .18s ease;
+		display: flex; flex-direction: column;
+	}
+	.workshop-card:hover {
+		transform: translateY(-3px) scale(1.01);
+		box-shadow: 0 14px 32px rgba(2,6,23,.12);
+	}
+
+	.workshop-banner { width: 100%; height: 180px; object-fit: cover; display: block; }
+	.workshop-body { padding: 1rem 1rem 1.25rem; display: flex; flex-direction: column; gap: .35rem; }
+	.workshop-title { margin: .25rem 0 .25rem; font-size: 1.05rem; color: #0f172a; font-weight: 700; }
+	.workshop-time { margin: 0; color: #334155; font-size: .92rem; }
+	.workshop-seats { margin: .25rem 0 .5rem; color: #2563eb; font-weight: 600; }
+
+	.workshop-btn {
+		align-self: flex-start;
+		background: #10b981; color: #ffffff; text-decoration: none;
+		padding: .55rem .9rem; border-radius: 10px; font-weight: 700;
+		box-shadow: 0 4px 12px rgba(16,185,129,.25);
+		transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
+	}
+	.workshop-btn:hover { background: #0ea371; transform: translateY(-1px); box-shadow: 0 8px 18px rgba(16,185,129,.35); }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var fallbackSrc = "{% static 'workshop_app/img/homepg.png' %}";
+        var titleToImage = {
+            'Intro to Algorithms': 'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1200&auto=format&fit=crop',
+            'Data Structures Workshop': 'https://images.unsplash.com/photo-1551281044-8c87d4df22db?q=80&w=1200&auto=format&fit=crop',
+            'Thermodynamics Basics': 'https://images.unsplash.com/photo-1581092580502-7c74c6d0aa9b?q=80&w=1200&auto=format&fit=crop',
+            'CAD for Beginners': 'https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?q=80&w=1200&auto=format&fit=crop',
+            'Circuit Analysis 101': 'https://images.unsplash.com/photo-1581093588401-16ec8a2d89a0?q=80&w=1200&auto=format&fit=crop',
+            'Power Systems Intro': 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=1200&auto=format&fit=crop',
+            'Structural Engineering Basics': 'https://images.unsplash.com/photo-1542623024-a797a755b8d0?q=80&w=1200&auto=format&fit=crop',
+            'Surveying Workshop': 'https://images.unsplash.com/photo-1504384764586-bb4cdc1707b0?q=80&w=1200&auto=format&fit=crop',
+            'Digital Electronics': 'https://images.unsplash.com/photo-1518773553398-650c184e0bb3?q=80&w=1200&auto=format&fit=crop',
+            'Embedded Systems Basics': 'https://images.unsplash.com/photo-1517433456452-f9633a875f6f?q=80&w=1200&auto=format&fit=crop',
+            'Chemical Process Safety': 'https://images.unsplash.com/photo-1532635223-4781b9d1d2b4?q=80&w=1200&auto=format&fit=crop',
+            'Reaction Engineering Intro': 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=1200&auto=format&fit=crop'
+        };
+
+        document.querySelectorAll('.workshop-card').forEach(function(card) {
+            var title = card.querySelector('.workshop-title');
+            var img = card.querySelector('.workshop-banner');
+            if (!title || !img) return;
+            var key = title.innerText.trim();
+            var custom = card.getAttribute('data-image');
+            var src = custom || titleToImage[key] || img.getAttribute('src') || fallbackSrc;
+            img.setAttribute('referrerpolicy', 'no-referrer');
+            if (img.src !== src) {
+                img.src = src;
+            }
+            img.addEventListener('error', function() {
+                if (img.src !== fallbackSrc) {
+                    img.src = fallbackSrc;
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

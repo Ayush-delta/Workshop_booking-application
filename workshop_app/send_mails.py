@@ -105,11 +105,19 @@ def send_email(	request, call_on,
 	booking confirmation.
 	'''
 	try:
-		with open(path.join(settings.LOG_FOLDER, 'emailconfig.yaml'), 'r') as configfile:
-			config_dict = yaml.load(configfile)
-		logging.config.dictConfig(config_dict)
-	except:
-		print('File Not Found and Configuration Error')
+		config_path = path.join(settings.LOG_FOLDER, 'emailconfig.yaml')
+		os.makedirs(settings.LOG_FOLDER, exist_ok=True)
+		with open(config_path, 'r') as configfile:
+			config_dict = yaml.safe_load(configfile)
+			log_filename = path.join(settings.LOG_FOLDER, 'emailfile.log')
+			open(log_filename, 'a').close()
+			if isinstance(config_dict, dict):
+				handlers = config_dict.get('handlers', {})
+				if 'emaillogfile' in handlers:
+					handlers['emaillogfile']['filename'] = log_filename
+			logging.config.dictConfig(config_dict)
+	except Exception:
+		logging.basicConfig(level=logging.INFO)
 
 	if call_on == "Registration":
 		message = dedent("""\
