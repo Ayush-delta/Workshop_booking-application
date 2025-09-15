@@ -70,19 +70,21 @@ function getDate( element ) {
 <div class="container">
   <div class="row">
 		<div class="col-md-6" align="left" >
-			  <fieldset data-mini="true">
-			    <label for="radio-1">Monthly Count </label>
-			    <input type="radio" name="radio-1" id="radio-1" value="NWPM">
-			    <label for="radio-2">Overall Count</label>
-			    <input type="radio" name="radio-1" id="radio-2" value="OWC">
-			    <label for="radio-3">India Map</label>
-			    <input type="radio" name="radio-1" id="radio-3" value="MOIN">
-			  </fieldset>
+ 			  <!-- Radio buttons to toggle between chart views: Monthly Workshops (bar), Overall Counts (pie), India Map (geochart) -->
+ 			  <fieldset data-mini="true">
+ 			    <label for="radio-1">Monthly Count </label>
+ 			    <input type="radio" name="radio-1" id="radio-1" value="NWPM">
+ 			    <label for="radio-2">Overall Count</label>
+ 			    <input type="radio" name="radio-1" id="radio-2" value="OWC">
+ 			    <label for="radio-3">India Map</label>
+ 			    <input type="radio" name="radio-1" id="radio-3" value="MOIN">
+ 			  </fieldset>
 		</div>
 	
 
 	{% if show_workshop_stats %}
 	<div  align="right" class="col-md-6">
+		<!-- Date range form for filtering/downloading workshop statistics -->
 		<form method="POST" >
 			{% csrf_token %}
 			<div class="form-group">
@@ -108,6 +110,7 @@ function getDate( element ) {
 
 	</div>
 	<br>
+		<!-- Table displaying upcoming workshops with pagination -->
 		<table class="table table-hover">
 			<thead>
 				<tr>
@@ -179,80 +182,96 @@ function getDate( element ) {
 	<br>
 	<div class="col-md-12 ">
 		<br>
+		<!-- Canvas for rendering Chart.js visualizations (bar/pie charts) -->
 		<canvas id="myChartPie" ></canvas>
 		<script>
+			// Initialize jQuery UI controlgroup for radio buttons
 			$( function() {
 			    $( "fieldset" ).controlgroup();
 			  });
 
+			// Chart.js context and instance variable
 			var ctx1 = document.getElementById("myChartPie").getContext('2d');
 			var myChart;
 
+			// Extract data from Django template context to avoid syntax errors in JS object literals
+			// These variables hold monthly workshop counts, workshop type labels/data, and India map data
+			var workshopCount = {{ workshop_count|safe }};
+			var typeLabels = {{ workshoptype_count.0|safe }};
+			var typeData = {{ workshoptype_count.1|safe }};
+			var indiaMapData = {{ india_map|safe }};
+
+			// Handle radio button changes to switch between chart types
 			$('input[type=radio]').change(function() {
 
 			        if (this.value == 'NWPM') {//Number of Workshops per month
+			            // Destroy existing chart if present
 			            if(myChart){
 			        	myChart.destroy();
 			            }
 
-
-			        document.getElementById("visualization").style.visibility='hidden';
-					myChart = new Chart(ctx1, {
-					    type: 'bar',
-					    data: {
-					        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-							datasets: [{
-							label: 'Number of workshops per Month for '+ dateToday.getFullYear(),
-					            data: {{ workshop_count | safe }},
-					            backgroundColor: [
-					                'rgba(255, 99, 132, 0.2)',
-					                'rgba(54, 162, 235, 0.2)',
-					                'rgba(255, 206, 86, 0.2)',
-					                'rgba(75, 192, 192, 0.2)',
-					                'rgba(153, 102, 255, 0.2)',
-					                'rgba(242, 38, 19, 0.2)',
-					                'rgba(25, 91, 13, 0.2)',
-					                'rgba(54, 12, 235, 0.2)',
-					                'rgba(150, 40, 27, 0.2)',
-					                'rgba(66, 114, 155, 0.2)',
-					                'rgba(219, 10, 91, 0.2)',
-					                'rgba(191, 191, 191, 0.2)'
-					            ],
-					            borderColor: [
-							        'rgba(255, 99, 132, 1)',
-					                'rgba(54, 162, 235, 1)',
-					                'rgba(255, 206, 86, 1)',
-					                'rgba(75, 192, 192, 1)',
-					                'rgba(153, 102, 255, 1)',
-					                'rgba(242, 38, 19, 1)',
-					                'rgba(25, 91, 13, 1)',
-					                'rgba(54, 12, 235, 1)',
-					                'rgba(150, 40, 27, 1)',
-					                'rgba(66, 114, 155, 1)',
-					                'rgba(219, 10, 91, 1)',
-					                'rgba(191, 191, 191, 1)'
-					            ],
-					            borderWidth: 1
-					        }]
-					    },
-					    options: {
-					     responsive: true,
-					     scales: {
-					            y: {
-					                ticks: {
-					                    beginAtZero: true
-					                }
-					            }
-					        }
-					    }
-					});
-				}
+			            // Hide map visualization
+			            document.getElementById("visualization").style.visibility='hidden';
+						// Bar chart for monthly workshops
+						myChart = new Chart(ctx1, {
+						    type: 'bar',
+						    data: {
+						        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+								datasets: [{
+								label: 'Number of workshops per Month for '+ dateToday.getFullYear(),
+						            data: workshopCount,
+						            backgroundColor: [
+						                'rgba(255, 99, 132, 0.2)',
+						                'rgba(54, 162, 235, 0.2)',
+						                'rgba(255, 206, 86, 0.2)',
+						                'rgba(75, 192, 192, 0.2)',
+						                'rgba(153, 102, 255, 0.2)',
+						                'rgba(242, 38, 19, 0.2)',
+						                'rgba(25, 91, 13, 0.2)',
+						                'rgba(54, 12, 235, 0.2)',
+						                'rgba(150, 40, 27, 0.2)',
+						                'rgba(66, 114, 155, 0.2)',
+						                'rgba(219, 10, 91, 0.2)',
+						                'rgba(191, 191, 191, 0.2)'
+						            ],
+						            borderColor: [
+								        'rgba(255, 99, 132, 1)',
+						                'rgba(54, 162, 235, 1)',
+						                'rgba(255, 206, 86, 1)',
+						                'rgba(75, 192, 192, 1)',
+						                'rgba(153, 102, 255, 1)',
+						                'rgba(242, 38, 19, 1)',
+						                'rgba(25, 91, 13, 1)',
+						                'rgba(54, 12, 235, 1)',
+						                'rgba(150, 40, 27, 1)',
+						                'rgba(66, 114, 155, 1)',
+						                'rgba(219, 10, 91, 1)',
+						                'rgba(191, 191, 191, 1)'
+						            ],
+						            borderWidth: 1
+						        }]
+						    },
+						    options: {
+						    	responsive: true,
+						    	scales: {
+						            y: {
+						                ticks: {
+						                    beginAtZero: true
+						                }
+						            }
+						        }
+						    }
+						});
+					}
 			    else if (this.value == 'OWC') { //Overall Workshop Count
+			        // Destroy existing chart if present
 			        if(myChart){
 			        	myChart.destroy();
 			        }
 			        
+			 // Hide map visualization
 			 document.getElementById("visualization").style.visibility='hidden';
+			 // Pie chart for workshop types distribution
 			 myChart = new Chart(ctx1, {
 			     type: 'pie',
 			     data: {
@@ -274,15 +293,18 @@ function getDate( element ) {
 			  });
 			     }
 else if (this.value == 'MOIN') {
+           // Destroy existing chart if present
            if(myChart){
        		myChart.destroy();
            }
 
+    // Calculate dialog dimensions based on window size
     var dWidth = $(window).width() * 0.9;
        var dHeight = $(window).height() * 0.9;
             
         
 
+       // Open modal dialog for India map visualization
        $( "#visualization" ).dialog({
 	resizable: false,
 	draggable: true,
@@ -295,8 +317,11 @@ else if (this.value == 'MOIN') {
 	modal: true
 	});
 
+	// Show map div
 	document.getElementById("visualization").style.visibility='visible';
+       // Function to draw Google GeoChart
        function drawVisualization() {
+	    // Use pre-extracted data for map (state-wise workshop counts)
 	    var data = google.visualization.arrayToDataTable(indiaMapData);
 
 	var opts = {
@@ -313,6 +338,7 @@ else if (this.value == 'MOIN') {
 	document.getElementById('visualization'));
 			geochart.draw(data, opts);
 	    };
+	// Load Google Visualization API if available
 	if(google) {
 	    google.load('visualization', '1.0', {
 		packages: ['geochart'],
@@ -323,14 +349,15 @@ else if (this.value == 'MOIN') {
            })
         }
 }
-			});
-		</script>
+});
+</script>
 		<style>
 		    #visualization path {
 		    stroke-width:1; /* control the countries borders width */
 		    stroke:white; /* choose a color for the border */
 		    }
 		</style>
+		<!-- Hidden div for Google GeoChart (India map); shown in modal on selection -->
 		<div id="visualization" style="width: 400px; height: 300px; display: none; margin: 0 auto;" ></div>
 
 	</div>
