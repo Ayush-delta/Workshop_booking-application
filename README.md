@@ -85,4 +85,86 @@
 
 These changes resolve all detected linter errors, improve code maintainability, and enhance user experience without altering functionality.
 
-__NOTE__: Check docs/Getting_Started.md for more info.
+### Contribution Guidelines
+We welcome contributions to improve the Workshop Booking system! Please follow these guidelines to ensure a smooth collaboration.
+
+#### How to Fork, Branch, and Submit Pull Requests (PRs)
+1. **Fork the Repository**:
+   - Go to the repository on GitHub and click "Fork" to create a copy under your account.
+
+2. **Clone Your Fork**:
+   ```
+   git clone https://github.com/your-username/workshop_booking.git
+   cd workshop_booking
+   git remote add upstream https://github.com/original-owner/workshop_booking.git
+   ```
+
+3. **Create a Feature Branch**:
+   - Base your branch off `main`:
+   ```
+   git checkout -b feature/your-feature-name
+   ```
+   - Use descriptive names (e.g., `fix/js-syntax-errors`, `feat/add-user-auth`).
+
+4. **Make Your Changes**:
+   - Implement your feature or fix, commit with clear messages:
+   ```
+   git add .
+   git commit -m "Fix: Resolve JS syntax in workshop_stats.html"
+   git push origin feature/your-feature-name
+   ```
+
+5. **Submit a Pull Request**:
+   - Open a PR on GitHub from your branch to the upstream `main`.
+   - Describe the changes, reference issues (e.g., "Fixes #123"), and include screenshots if UI-related.
+   - Ensure the PR passes CI checks (if set up) and tests.
+
+6. **Sync with Upstream** (if needed):
+   ```
+   git fetch upstream
+   git merge upstream/main
+   git push origin feature/your-feature-name
+   ```
+
+#### Coding Conventions and Best Practices
+- **Python/Django**:
+  - Follow [PEP 8](https://peps.python.org/pep-0008/) style guide (use tools like Black or autopep8).
+  - Use Django's ORM efficiently; avoid raw SQL unless necessary.
+  - Write DRY (Don't Repeat Yourself) code; leverage class-based views where appropriate.
+  - Secure against common vulnerabilities (e.g., CSRF, XSS) – always use `{% csrf_token %}` in forms.
+
+- **JavaScript/HTML/CSS**:
+  - Use ES6+ syntax; lint with ESLint for consistency.
+  - Ensure semantic HTML5; validate with W3C tools.
+  - For charts/maps, prefer modular data handling (as in recent JS refactors) to avoid template interpolation issues.
+  - Responsive design with Bootstrap; test on mobile.
+
+- **General**:
+  - Commit atomic changes; one feature/fix per PR.
+  - Update documentation (e.g., this README, inline comments) for non-obvious code.
+  - Use type hints in Python where possible.
+
+#### Testing and Local Setup for Developers
+- **Local Setup**: Follow the "Setup Instructions" above. For development:
+  ```
+  # Run tests
+  python manage.py test
+
+  # Run with debug mode (settings.py DEBUG=True)
+  python manage.py runserver
+
+  # Lint code
+  pip install flake8  # For Python
+  flake8 ./
+  ```
+
+- **Testing**:
+  - Write unit tests in `tests.py` files using Django's TestCase.
+  - Cover models, views, forms; aim for >80% coverage (use coverage.py).
+  - For frontend: Manual browser testing; consider adding Jest for JS.
+  - Run migrations before testing: `python manage.py makemigrations && python manage.py migrate`.
+
+- **Debugging**:
+  - Use Django debug toolbar (`pip install django-debug-toolbar`).
+  - Check console for JS errors; use browser dev tools.
+
