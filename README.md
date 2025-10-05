@@ -172,7 +172,7 @@ We welcome contributions to improve the Workshop Booking system! Please follow t
 #### Planned Features/Enhancements
 - Integrate real-time notifications for workshop approvals/rejections using WebSockets (Django Channels).
 - Add advanced filtering for statistics (e.g., by instructor, region) with AJAX updates.
-- Support multi-language (i18n) for broader accessibility.
+- Support multi-language for broader accessibility.
 - API endpoints for mobile app integration (using Django REST Framework).
 
 #### Targeted Bug Fixes
